@@ -295,7 +295,7 @@ st.markdown("""
 <div style="background-color: rgba(151, 166, 195, 0.05); 
            padding: 15px; border-radius: 8px; margin-top: 30px; text-align: center;">
     <p style="margin: 0; font-size: 14px; color: #6c757d;">
-        Decryption Detective | Built with by Srikar, Anish, and Sayuon using Streamlit and Chepy
+        Decryption Detective | Built by Srikar, Anish, and Sayuon using Streamlit and Chepy
     </p>
 </div>
 """, unsafe_allow_html=True)

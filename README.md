@@ -3,5 +3,6 @@
 
 commands:
 
-npm install
-npm install crypto-js
+npm install -g npm
+
+npm install @stdlib/stdlib morse-code-converter rot47

@@ -1,4 +1,5 @@
 import random
+import os
 
 import streamlit as st
 from chepy import Chepy
@@ -6,7 +7,7 @@ from chepy import Chepy
 from google import genai
 from google.genai import types
 
-client = genai.Client(api_key="AIzaSyDkATCGq6Myjee7orTQdB6-1wlzGCL6GYk")
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
 ctf_data = [
     ["122 105 126 117 114 125 124 111 117 116", "REVOLUTION", "OCTAL+ROT13"],

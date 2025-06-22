@@ -9,6 +9,11 @@ from google.genai import types
 
 client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
+st.set_page_config(
+    page_title="Decryption Detective",
+    page_icon="🕵️",
+)
+
 ctf_data = [
     ["122 105 126 117 114 125 124 111 117 116", "REVOLUTION", "OCTAL+ROT13"],
     ["68 73 83 67 79 86 69 82 89", "DISCOVERY", "CHARCODE"],
@@ -62,139 +67,235 @@ ctf_data = [
     ["WVURMRGRLM", "DEFINITION", "ATBASH"]
 ]
 
-hide_streamlit_style = """
+
+st.markdown("""
 <style>
-.stAppDeployButton {
-        visibility: hidden;
+    .stSelectbox, .stTextInput {
+        font-size: 1.2rem;
+    }
+    button, .stButton>button {
+        font-size: 1.2rem;
+        padding: 0.5rem 2rem;
+    }
+    .stSuccess, .stError, .stInfo {
+        font-size: 1.3rem;
+        padding: 1.5rem;
+    }
+    h1, h2, h3 {
+        margin-top: 1rem;
+    }
+    
+    .stAppDeployButton {
+            visibility: hidden;
+        }
+    
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: 3rem;
+        padding-right: 3rem;
+        max-width: 100% !important;
     }
 
-#MainMenu {visibility: hidden;}
-footer {visibility: hidden;}
+    .stSelectbox, .stTextInput input, .stTextArea textarea, .stToggleSwitch {
+        font-size: 1.4rem !important;
+        padding: 1rem !important;
+    }
 
+    .stButton button {
+        font-size: 1.3rem !important;
+        padding: 1rem 2rem !important;
+    }
+
+    h1, h2, h3, h4 {
+        font-size: 2rem !important;
+    }
+
+    .stTextInput, .stSelectbox, .stTextArea {
+        width: 100% !important;
+    }
+
+    .stTabs [data-baseweb="tab-list"] {
+        justify-content: space-between;
+        display: flex;
+        width: 100%;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        flex-grow: 1;
+        font-size: 1.2rem;
+    }
+        .stTabs [data-baseweb="tab-list"] {
+        gap: 2px;
+        width: 100%;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        flex: 1;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 4px 4px 0 0;
+        padding: 10px 16px;
+        font-weight: 600;
+        background-color: #262730;
+    }
+
+    .stTabs [aria-selected="true"] {
+        background-color: #151820;
+    }
 </style>
+<div style="display: flex; justify-content: center; align-items: center;">
+    <img src="https://github.com/AnishD4/Encryption/blob/main/logo.png?raw=true" style="width: 800px;" />
+</div>
 
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown("### Cipher Tools")
+    st.markdown("Transform your text using multiple cipher algorithms")
+with col2:
+    st.markdown("### CTF Challenge")
+    st.markdown("Test your decryption skills with cipher puzzles")
+with col3:
+    st.markdown("### AI Analysis")
+    st.markdown("Let AI detect which cipher was used")
 
-st.image("logo.png", width=1000)
+tab1, tab2, tab3 = st.tabs(["Encrypt/Decrypt", "CTF Challenge", "AI Analyze"])
 
 options = ["base64", "Morse", "Hexadecimal", "ROT13", "Binary", "Atbash", "Octal", "Charcode", "base32", "ROT47"]
+with tab1:
+    selected = st.selectbox("Which cipher would you like to encode/decode?", options)
 
-selected = st.selectbox("Which cipher would you like to encode/decode?", options)
-
-txt = st.text_input("Enter the input you want decode/encode:")
-encode = st.toggle("Encode or Decode")
-if encode:
-    st.write("Mode: Encoding")
-else:
-    st.write("Mode: Decoding")
-res = "Error"
-match selected:
-    case "base64":
-        if encode:
-            res = Chepy(txt).to_base64()
-        else:
-            res = Chepy(txt).from_base64()
-    case "Morse":
-        if encode:
-            res = Chepy(txt).to_morse_code()
-        else:
-            res = Chepy(txt).from_morse_code()
-    case "Hexadecimal":
-        if encode:
-            res = Chepy(txt).to_hex()
-        else:
-            res = Chepy(txt).from_hex()
-    case "ROT13":
-        res = Chepy(txt).rot_13()
-    case "Binary":
-        if encode:
-            res = Chepy(txt).to_binary()
-        else:
-            res = Chepy(txt).from_binary()
-    case "Atbash":
-        if encode:
-            res = Chepy(txt).atbash_encode()
-        else:
-            res = Chepy(txt).atbash_decode()
-    case "Octal":
-        if encode:
-            res = Chepy(txt).to_octal()
-        else:
-            res = Chepy(txt).from_octal()
-    case "Charcode":
-        if encode:
-            res = Chepy(txt).to_charcode()
-        else:
-            res = Chepy(txt).from_charcode()
-    case "base32":
-        if encode:
-            res = Chepy(txt).to_base32()
-        else:
-            res = Chepy(txt).from_base32()
-    case "ROT47":
-        res = Chepy(txt).rot_47
-
-res = str(res)
-if res:
-    res = "Result: **" + res + "**"
-    st.success(res)
-
-st.markdown("---")
-
-st.header("CTF Challenge")
-st.write("Test your cipher decoding skills with a decoding challenge!")
-
-if "ctf_challenge" not in st.session_state:
-    st.session_state.ctf_challenge = None
-    st.session_state.user_solved = False
-
-if st.button("Get New Challenge"):
-    st.session_state.ctf_challenge = random.choice(ctf_data)
-    st.session_state.user_solved = False
-    st.session_state.revealed = False
-
-if st.session_state.ctf_challenge:
-    encrypted_text, answer, method = st.session_state.ctf_challenge
-
-    st.write(f"**Encrypted text:** `{encrypted_text}`")
-    st.write(f"**Hint:** This was encoded using {method}")
-
-    ans = st.text_input("Your solution:", key="ctf_solution")
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Submit Answer"):
-            if ans.upper() == answer.upper():
-                st.success("Correct! You solved it!")
-                st.session_state.user_solved = True
-            else:
-                st.error("You are incorrect. Try again!")
-
-    with col2:
-        if st.button("Reveal Answer"):
-            st.session_state.revealed = True
-
-    if "revealed" in st.session_state and st.session_state.revealed:
-        st.info(f"The answer is: **{answer}**")
-
-st.header("AI Cipher type detector")
-st.write("Enter a encoded string and an AI will evaluate your text and tell you what cipher it was encoded with")
-
-inp = st.text_input("Enter your encoded string:")
-if inp:
-    st_placeholder = st.empty()
-    st_placeholder.markdown("**Thinking...**")
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        config=types.GenerateContentConfig(
-            system_instruction="You are a cipher identification assistant. When given an encoded string, analyze it and return only the name(s) of the cipher or encoding method(s) used, in the order you believe they were applied. Focus primarily on the following types: base64, Morse, Hexadecimal, ROT13, Binary, Atbash, Octal, Charcode, base32, and ROT47, but include others if clearly identifiable. Do not provide explanations, decoding, or any additional text—only output the list of cipher names in order in this format: cipher1+cipher2+cipher3... . If unsure, output unsure."),
-        contents="User Input:" + inp
-    )
-    st_placeholder.empty()
-    output = response.text
-    if output.lower() == "unsure":
-        st.error("**The AI has analyzed patterns in your encoded string but it was not able to identify any valid ciphers**")
+    txt = st.text_input("Enter the input you want decode/encode:")
+    encode = st.toggle("Encode or Decode")
+    if encode:
+        st.write("Mode: **Encoding**")
     else:
-        st.success("The AI has analyzed patterns in your encoded string and has identified the most likely cipher(s) it was encoded with to be: **"+output+"**")
+        st.write("Mode: **Decoding**")
+    res = "Error"
+    match selected:
+        case "base64":
+            if encode:
+                res = Chepy(txt).to_base64()
+            else:
+                res = Chepy(txt).from_base64()
+        case "Morse":
+            if encode:
+                res = Chepy(txt).to_morse_code()
+            else:
+                res = Chepy(txt).from_morse_code()
+        case "Hexadecimal":
+            if encode:
+                res = Chepy(txt).to_hex()
+            else:
+                res = Chepy(txt).from_hex()
+        case "ROT13":
+            res = Chepy(txt).rot_13()
+        case "Binary":
+            if encode:
+                res = Chepy(txt).to_binary()
+            else:
+                res = Chepy(txt).from_binary()
+        case "Atbash":
+            if encode:
+                res = Chepy(txt).atbash_encode()
+            else:
+                res = Chepy(txt).atbash_decode()
+        case "Octal":
+            if encode:
+                res = Chepy(txt).to_octal()
+            else:
+                res = Chepy(txt).from_octal()
+        case "Charcode":
+            if encode:
+                res = Chepy(txt).to_charcode()
+            else:
+                res = Chepy(txt).from_charcode()
+        case "base32":
+            if encode:
+                res = Chepy(txt).to_base32()
+            else:
+                res = Chepy(txt).from_base32()
+        case "ROT47":
+            res = Chepy(txt).rot_47
+
+    res = str(res)
+    if res:
+        res = "Result: **" + res + "**"
+        st.success(res)
+
+with tab2:
+    st.header("CTF Challenge")
+    st.write("Test your cipher decoding skills with a decoding challenge!")
+
+    if "ctf_challenge" not in st.session_state:
+        st.session_state.ctf_challenge = None
+        st.session_state.user_solved = False
+
+    if st.button("Get New Challenge"):
+        st.session_state.ctf_challenge = random.choice(ctf_data)
+        st.session_state.user_solved = False
+        st.session_state.revealed = False
+
+    if st.session_state.ctf_challenge:
+        encrypted_text, answer, method = st.session_state.ctf_challenge
+
+        st.write(f"**Encrypted text:** `{encrypted_text}`")
+        st.write(f"**Hint:** This was encoded using {method}")
+
+        ans = st.text_input("Your solution:", key="ctf_solution")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Submit Answer"):
+                if ans.upper() == answer.upper():
+                    st.success("Correct! You solved it!")
+                    st.session_state.user_solved = True
+                else:
+                    st.error("You are incorrect. Try again!")
+
+        with col2:
+            if st.button("Reveal Answer"):
+                st.session_state.revealed = True
+
+        if "revealed" in st.session_state and st.session_state.revealed:
+            st.info(f"The answer is: **{answer}**")
+
+with tab3:
+    st.header("AI Cipher type detector")
+    st.write("Enter a encoded string and an AI will evaluate your text and tell you what cipher it was encoded with")
+
+    inp = st.text_input("Enter your encoded string:")
+    if inp:
+        st_placeholder = st.empty()
+        st_placeholder.markdown("**Thinking...**")
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            config=types.GenerateContentConfig(
+                system_instruction="You are a cipher identification assistant. When given an encoded string, analyze it and return only the name(s) of the cipher or encoding method(s) used, in the order you believe they were applied. Focus primarily on the following types: base64, Morse, Hexadecimal, ROT13, Binary, Atbash, Octal, Charcode, base32, and ROT47, but include others if clearly identifiable. Do not provide explanations, decoding, or any additional text—only output the list of cipher names in order in this format: cipher1+cipher2+cipher3... . If unsure, output unsure."),
+            contents="User Input:" + inp
+        )
+        st_placeholder.empty()
+        output = response.text
+        if output.lower() == "unsure":
+            st.error("**The AI has analyzed patterns in your encoded string but it was not able to identify any valid ciphers**")
+        else:
+            st.success("The AI has analyzed patterns in your encoded string and has identified the most likely cipher(s) it was encoded with to be: **"+output+"**")
+
+
+
+st.markdown("""
+<div style="background-color: rgba(151, 166, 195, 0.05); 
+           padding: 15px; border-radius: 8px; margin-top: 30px; text-align: center;">
+    <p style="margin: 0; font-size: 14px; color: #6c757d;">
+        Decryption Detective | Built with by Srikar, Anish, and Sayuon using Streamlit and Chepy
+    </p>
+</div>
+""", unsafe_allow_html=True)
